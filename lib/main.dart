@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:onof_test_task/ui/widgets/auth/auth_widget.dart';
+import 'package:onof_test_task/ui/navigation/main_navigation.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  //static чтобы не пересоздавался, он все равно всегда будет без изменений
+  static final mainNavigation = MainNavigation();
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,7 +17,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const AuthWidget(),
+      initialRoute: mainNavigation.initialRoute(true),
+      routes: mainNavigation.routes,
     );
   }
 }
