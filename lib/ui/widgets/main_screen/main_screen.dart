@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:onof_test_task/domain/data_providers/token_data_provider.dart';
+import 'package:onof_test_task/ui/navigation/main_navigation.dart';
 
 class MainScreenWidget extends StatelessWidget {
   const MainScreenWidget({Key? key}) : super(key: key);
@@ -79,7 +81,11 @@ class MainScreenWidget extends StatelessWidget {
             const Expanded(child: SizedBox()),
             SafeArea(
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  TokenDataProvider().setToken(null);
+                  Navigator.pushReplacementNamed(
+                      context, MainNavigationRouteNames.auth);
+                },
                 child: const Text('Logout'),
               ),
             )
