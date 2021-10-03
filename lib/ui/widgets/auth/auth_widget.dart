@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:onof_test_task/domain/api_client/api_client.dart';
-import 'package:onof_test_task/ui/navigation/main_navigation.dart';
 import 'package:onof_test_task/ui/widgets/auth/auth_model.dart';
 import 'package:provider/provider.dart';
 
