@@ -2,12 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:onof_test_task/domain/api_client/api_client.dart';
-import 'package:onof_test_task/domain/data_providers/token_data_provider.dart';
+import 'package:onof_test_task/domain/data_providers/session_data_provider.dart';
 import 'package:onof_test_task/ui/navigation/main_navigation.dart';
+
+enum ApiClientAuthExceptionType { network, auth, portal, other }
+
+class ApiClientAuthException implements Exception {
+  final ApiClientAuthExceptionType type;
+
+  ApiClientAuthException(this.type);
+}
 
 class AuthModel extends ChangeNotifier {
   final _apiCLient = ApiClient();
-  final _sessionDataProvider = TokenDataProvider();
+  final _sessionDataProvider = SessionDataProvider();
 
   final loginTextController = TextEditingController();
   final passTextController = TextEditingController();
@@ -33,13 +41,27 @@ class AuthModel extends ChangeNotifier {
     }
     _errorMessage = null;
     _isAuthProgress = true;
+
     notifyListeners();
     String? token;
     try {
       token = await _apiCLient.auth(
           username: username, password: password, portal: portal);
-    } catch (e) {
-      _errorMessage = 'Произошла ошибка. Попробуйте еще раз.';
+    } on ApiClientAuthException catch (e) {
+      switch (e.type) {
+        case ApiClientAuthExceptionType.network:
+          _errorMessage = 'Server not available. Check internet connection.';
+          break;
+        case ApiClientAuthExceptionType.auth:
+          _errorMessage = 'Incorrect login or password.';
+          break;
+        case ApiClientAuthExceptionType.portal:
+          _errorMessage = 'Check the name of the portal.';
+          break;
+        case ApiClientAuthExceptionType.other:
+          _errorMessage = 'An error has occurred. Try again.';
+          break;
+      }
     }
 
     _isAuthProgress = false;
@@ -49,11 +71,12 @@ class AuthModel extends ChangeNotifier {
     }
 
     if (token == null) {
-      _errorMessage = 'Неизвестная ошибка, повторите попытку.';
+      _errorMessage = 'An error has occurred. Try again.';
       return;
     }
 
     await _sessionDataProvider.setToken(token);
+    await _sessionDataProvider.setPortal(portal);
 
     unawaited(Navigator.of(context)
         .pushReplacementNamed(MainNavigationRouteNames.mainScreen));

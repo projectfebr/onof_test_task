@@ -10,7 +10,7 @@ class AuthWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authModel = context.read<AuthModel>();
+    final authModel = context.watch<AuthModel>();
     return Scaffold(
         body: SafeArea(
       child: Center(
@@ -29,6 +29,8 @@ class AuthWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       TextFormField(
+                        enabled: authModel.canStartAuth,
+                        textInputAction: TextInputAction.next,
                         controller: authModel.portalTextController,
                         decoration: const InputDecoration(
                           labelText: 'Portal',
@@ -42,6 +44,8 @@ class AuthWidget extends StatelessWidget {
                         },
                       ),
                       TextFormField(
+                        enabled: authModel.canStartAuth,
+                        textInputAction: TextInputAction.next,
                         controller: authModel.loginTextController,
                         decoration: const InputDecoration(
                           labelText: 'Login',
@@ -51,22 +55,11 @@ class AuthWidget extends StatelessWidget {
                           if (value == null || value.isEmpty) {
                             return 'Please enter login';
                           }
+
                           return null;
                         },
                       ),
-                      TextFormField(
-                        controller: authModel.passTextController,
-                        decoration: const InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Enter password',
-                        ),
-                        validator: (String? value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter password';
-                          }
-                          return null;
-                        },
-                      ),
+                      _PasswordTextField(authModel: authModel),
                       const SizedBox(height: 40),
                       const _ErrorMessageWidget(),
                       const _AuthButtonWidget(),
@@ -80,14 +73,64 @@ class AuthWidget extends StatelessWidget {
   }
 }
 
+class _PasswordTextField extends StatefulWidget {
+  const _PasswordTextField({
+    Key? key,
+    required this.authModel,
+  }) : super(key: key);
+
+  final AuthModel authModel;
+
+  @override
+  State<_PasswordTextField> createState() => _PasswordTextFieldState();
+}
+
+class _PasswordTextFieldState extends State<_PasswordTextField> {
+  bool _passwordVisible = false;
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      enabled: widget.authModel.canStartAuth,
+      textInputAction: TextInputAction.done,
+      obscureText: !_passwordVisible,
+      controller: widget.authModel.passTextController,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        hintText: 'Enter password',
+        suffixIcon: IconButton(
+          onPressed: () {
+            _passwordVisible = !_passwordVisible;
+            setState(() {});
+          },
+          icon: _passwordVisible
+              ? const Icon(Icons.visibility_off, size: 20)
+              : const Icon(Icons.visibility, size: 20),
+        ),
+      ),
+      validator: (String? value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter password';
+        }
+        return null;
+      },
+    );
+  }
+}
+
 class _AuthButtonWidget extends StatelessWidget {
   const _AuthButtonWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final authModel = context.watch<AuthModel>();
-    final onPressed =
-        authModel.canStartAuth == true ? () => authModel.auth(context) : null;
+    final onPressed = authModel.canStartAuth == true
+        ? () {
+            final formState = context.findAncestorStateOfType<FormState>();
+            if (formState != null && formState.validate()) {
+              authModel.auth(context);
+            }
+          }
+        : null;
     final child = authModel.isAuthProgress == true
         ? const SizedBox(
             width: 15,
@@ -117,5 +160,16 @@ class _ErrorMessageWidget extends StatelessWidget {
         style: const TextStyle(color: Colors.red, fontSize: 17),
       ),
     );
+  }
+}
+
+mixin InputValidationMixin {
+  bool isPasswordValid(String password) => password.length == 6;
+
+  bool isEmailValid(String email) {
+    String pattern =
+        '^(([^<>()[]\\.,;:s@"]+(.[^<>()[]\\.,;:s@"]+)*)|(".+"))@(([[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}])|(([a-zA-Z-0-9]+.)+[a-zA-Z]{2,}))\$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(email);
   }
 }
