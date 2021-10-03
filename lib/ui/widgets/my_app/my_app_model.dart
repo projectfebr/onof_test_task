@@ -1,7 +1,7 @@
-import 'package:onof_test_task/domain/data_providers/token_data_provider.dart';
+import 'package:onof_test_task/domain/data_providers/session_data_provider.dart';
 
 class MyAppModel {
-  final _tokenApiProvider = TokenDataProvider();
+  final _tokenApiProvider = SessionDataProvider();
 
   var _isAuth = false;
   bool get isAuth => _isAuth;
