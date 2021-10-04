@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onof_test_task/domain/api_client/api_addresses.dart';
 import 'package:onof_test_task/ui/widgets/documents_list/documents_list_model.dart';
 import 'package:onof_test_task/ui/widgets/drawer_widget/drawer_widget.dart';
 import 'package:onof_test_task/ui/widgets/documents_list/documents_list_widget.dart';
@@ -45,7 +46,16 @@ class _BodyWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedTab =
         context.select<MainScreenModel, Section>((model) => model.selectedTab);
-    final documentsListModel = DocumentsListModel(selectedTab);
+    String api;
+    switch (selectedTab) {
+      case Section.myDocuments:
+        api = ApiEndpoint.myDocuments;
+        break;
+      case Section.commonDocuments:
+        api = ApiEndpoint.commonDocuments;
+        break;
+    }
+    final documentsListModel = DocumentsListModel(api);
     return ChangeNotifierProvider<DocumentsListModel>.value(
       value: documentsListModel,
       child: const DocumentsListWidget(),
