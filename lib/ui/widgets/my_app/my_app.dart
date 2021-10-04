@@ -3,7 +3,8 @@ import 'package:onof_test_task/ui/navigation/main_navigation.dart';
 import 'package:onof_test_task/ui/widgets/my_app/my_app_model.dart';
 
 class MyApp extends StatelessWidget {
-  //static чтобы не пересоздавался, он все равно всегда будет без изменений
+  //static mainNavigation чтобы не пересоздавался,
+  //он все равно всегда будет без изменений
   static final mainNavigation = MainNavigation();
   final MyAppModel model;
   const MyApp({Key? key, required this.model}) : super(key: key);
