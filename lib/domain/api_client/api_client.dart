@@ -3,13 +3,13 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:onof_test_task/domain/api_client/api_addresses.dart';
 import 'package:onof_test_task/domain/entity/documents_list_response.dart';
 import 'package:onof_test_task/domain/entity/user_profile.dart';
 import 'package:onof_test_task/ui/widgets/auth/auth_model.dart';
 
-///
-///statusCode: 404 неправильно указан портал
-///statusCode: 500 неприавльные логин и пароль
+///statusCode: 404 (когда неправильно указан портал)
+///statusCode: 500 ошибка
 
 String makeHost(String portal) {
   if (portal == 'personal') {
@@ -26,7 +26,7 @@ class ApiClient {
     required String portal,
   }) async {
     final host = makeHost(portal);
-    var url = Uri.parse('$host/api/2.0/authentication.json');
+    var url = Uri.parse('$host/${ApiEndpoint.auth}');
 
     try {
       var response = await http
@@ -61,14 +61,12 @@ class ApiClient {
     }
   }
 
-/////////////
-
   Future<UserProfile> getUserProfile({
     required String token,
     required String portal,
   }) async {
     final host = makeHost(portal);
-    var url = Uri.parse('$host/api/2.0/people/@self');
+    var url = Uri.parse('$host/${ApiEndpoint.profile}');
     try {
       var response = await http.get(
         url,
@@ -89,8 +87,6 @@ class ApiClient {
       throw ApiClientAuthException(ApiClientAuthExceptionType.other);
     }
   }
-
-////////////
 
   Future<DocumentsList> getDocumentsList({
     required String token,
