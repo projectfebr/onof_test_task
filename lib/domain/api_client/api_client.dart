@@ -6,10 +6,17 @@ import 'package:http/http.dart';
 import 'package:onof_test_task/domain/api_client/api_addresses.dart';
 import 'package:onof_test_task/domain/entity/documents_list_response.dart';
 import 'package:onof_test_task/domain/entity/user_profile.dart';
-import 'package:onof_test_task/ui/widgets/auth/auth_model.dart';
 
 ///statusCode: 404 (когда неправильно указан портал)
 ///statusCode: 500 ошибка
+///
+enum ApiClientExceptionType { network, auth, portal, other }
+
+class ApiClientException implements Exception {
+  final ApiClientExceptionType type;
+
+  ApiClientException(this.type);
+}
 
 String makeHost(String portal) {
   if (portal == 'personal') {
@@ -43,21 +50,21 @@ class ApiClient {
           )
           .timeout(
             const Duration(seconds: 20),
-            onTimeout: () => throw ApiClientAuthException(
-                ApiClientAuthExceptionType.network),
+            onTimeout: () =>
+                throw ApiClientException(ApiClientExceptionType.network),
           );
       if (response.statusCode == 404) {
-        return throw ApiClientAuthException(ApiClientAuthExceptionType.portal);
+        return throw ApiClientException(ApiClientExceptionType.portal);
       }
       final responseJson = jsonDecode(response.body);
       _validateResponse(response, responseJson);
       return jsonDecode(response.body)['response']['token'];
     } on SocketException {
-      throw ApiClientAuthException(ApiClientAuthExceptionType.network);
-    } on ApiClientAuthException {
+      throw ApiClientException(ApiClientExceptionType.network);
+    } on ApiClientException {
       rethrow;
     } catch (e) {
-      throw ApiClientAuthException(ApiClientAuthExceptionType.other);
+      throw ApiClientException(ApiClientExceptionType.other);
     }
   }
 
@@ -80,11 +87,11 @@ class ApiClient {
       final userProfile = UserProfile.fromJson(json);
       return userProfile;
     } on SocketException {
-      throw ApiClientAuthException(ApiClientAuthExceptionType.network);
-    } on ApiClientAuthException {
+      throw ApiClientException(ApiClientExceptionType.network);
+    } on ApiClientException {
       rethrow;
     } catch (e) {
-      throw ApiClientAuthException(ApiClientAuthExceptionType.other);
+      throw ApiClientException(ApiClientExceptionType.other);
     }
   }
 
@@ -108,11 +115,11 @@ class ApiClient {
       final documentsListResponse = DocumentsList.fromJson(json);
       return documentsListResponse;
     } on SocketException {
-      throw ApiClientAuthException(ApiClientAuthExceptionType.network);
-    } on ApiClientAuthException {
+      throw ApiClientException(ApiClientExceptionType.network);
+    } on ApiClientException {
       rethrow;
     } catch (e) {
-      throw ApiClientAuthException(ApiClientAuthExceptionType.other);
+      throw ApiClientException(ApiClientExceptionType.other);
     }
   }
 
@@ -121,9 +128,9 @@ class ApiClient {
       final int status = json["statusCode"] as int;
       final code = status is int ? status : 0;
       if (code == 500) {
-        throw ApiClientAuthException(ApiClientAuthExceptionType.auth);
+        throw ApiClientException(ApiClientExceptionType.auth);
       } else {
-        throw ApiClientAuthException(ApiClientAuthExceptionType.other);
+        throw ApiClientException(ApiClientExceptionType.other);
       }
     }
   }
