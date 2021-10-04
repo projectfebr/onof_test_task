@@ -79,11 +79,15 @@ class _HeaderWidget extends StatelessWidget {
         child: Center(
           child: Row(
             children: [
-              // CircleAvatar(
-              //   radius: 30,
-              //   backgroundColor: Colors.transparent,
-              //   backgroundImage: NetworkImage(model.avatarPath ?? ''),
-              // ),
+              if (model.avatarPath != null)
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.transparent,
+                  backgroundImage: NetworkImage(
+                    model.avatarPath!,
+                    headers: {'Authorization': model.token ?? ''},
+                  ),
+                ),
               const SizedBox(width: 15),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
