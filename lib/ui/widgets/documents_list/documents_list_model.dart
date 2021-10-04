@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:onof_test_task/domain/api_client/api_addresses.dart';
 import 'package:onof_test_task/domain/api_client/api_client.dart';
 import 'package:onof_test_task/domain/data_providers/session_data_provider.dart';
 import 'package:onof_test_task/domain/entity/documents_list_response.dart';
 import 'package:onof_test_task/ui/widgets/main_screen/main_screen_model.dart';
 
 class DocumentsListModel extends ChangeNotifier {
-  DocumentsListModel(Section section) {
-    resetList(section);
+  DocumentsListModel(String api) {
+    loadDocuments(api);
   }
 
   final _apiClient = ApiClient();
@@ -20,32 +21,36 @@ class DocumentsListModel extends ChangeNotifier {
 
   final DateFormat _dateFormat = DateFormat.yMMMMd();
 
+  int? parentId;
+  int? currentId;
+
   String stringFromDate(DateTime? date) =>
       date != null ? _dateFormat.format(date) : '';
 
-  Future<void> loadDocuments(Section section) async {
+  Future<void> loadDocuments(String api) async {
     final token = await SessionDataProvider().getToken();
     final portal = await SessionDataProvider().getPortal();
     if (token == null || portal == null) return;
     DocumentsList documentsListResponse;
-    switch (section) {
-      case Section.myDocuments:
-        documentsListResponse = await _apiClient.getDocumentsList(
-            token: token, portal: portal, api: 'api/2.0/files/@my');
-        break;
-      case Section.commonDocuments:
-        documentsListResponse = await _apiClient.getDocumentsList(
-            token: token, portal: portal, api: 'api/2.0/files/@common');
-        break;
-    }
+
+    documentsListResponse = await _apiClient.getDocumentsList(
+        token: token, portal: portal, api: api);
+
     _folders.addAll(documentsListResponse.response.folders);
     _files.addAll(documentsListResponse.response.files);
+    parentId = documentsListResponse.response.current.parentId;
+    currentId = documentsListResponse.response.current.id;
     notifyListeners();
   }
 
-  Future<void> resetList(Section section) async {
+  Future<void> getList(String api) async {
     _folders.clear();
     _files.clear();
-    await loadDocuments(section);
+    notifyListeners();
+    await loadDocuments(api);
+  }
+
+  Future<void> updateList() async {
+    await getList('${ApiEndpoint.filesByFolderId}/$currentId');
   }
 }
