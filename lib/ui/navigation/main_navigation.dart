@@ -10,6 +10,8 @@ class MainNavigationRouteNames {
   static const mainScreen = '/';
 }
 
+// MainNavigator содержит роуты и метод возрващающий initialRoute
+//в зависимости от статуса авторизации
 class MainNavigation {
   String initialRoute(bool isAuth) => isAuth
       ? MainNavigationRouteNames.mainScreen

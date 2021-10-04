@@ -31,10 +31,12 @@ class AuthModel extends ChangeNotifier {
       notifyListeners();
       return;
     }
+
+    // если поля заполнены - убираем ошибку, ставим статус авторизации в процессе
     _errorMessage = null;
     _isAuthProgress = true;
-
     notifyListeners();
+
     String? token;
     try {
       token = await _apiCLient.auth(
@@ -56,6 +58,7 @@ class AuthModel extends ChangeNotifier {
       }
     }
 
+// после выполнения запроса меняем статус авторизации, и если есть ошибки - оповещаем слушателей
     _isAuthProgress = false;
     if (_errorMessage != null) {
       notifyListeners();
@@ -67,6 +70,7 @@ class AuthModel extends ChangeNotifier {
       return;
     }
 
+// сохраняем портал и токен
     await _sessionDataProvider.setToken(token);
     await _sessionDataProvider.setPortal(portal);
 

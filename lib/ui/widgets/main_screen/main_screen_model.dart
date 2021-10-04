@@ -5,8 +5,17 @@ import 'package:onof_test_task/domain/data_providers/session_data_provider.dart'
 enum Section { myDocuments, commonDocuments }
 
 class MainScreenModel extends ChangeNotifier {
+  // при инициализации получаем данные профиля
+  MainScreenModel() {
+    setUserData();
+  }
+
+  //Состояние: какая папка выбрана
   Section selectedTab = Section.myDocuments;
+
   final _apiClient = ApiClient();
+
+// устанавливаются в setUserDate()
   String? userName;
   String? userEmail;
   String? avatarPath;
@@ -22,7 +31,8 @@ class MainScreenModel extends ChangeNotifier {
 
     token = await SessionDataProvider().getToken();
     final portal = await SessionDataProvider().getPortal();
-    if (token == null || portal == null) return;
+    if (portal == null) return;
+    if (token == null) return;
     final userProfile =
         await _apiClient.getUserProfile(token: token!, portal: portal);
     userName =
@@ -34,6 +44,7 @@ class MainScreenModel extends ChangeNotifier {
     notifyListeners();
   }
 
+// стандартный аватар имеет другой путь, реализована проверка
   String _generateAvatarPath(String sourcePath, String portal) {
     if (sourcePath.contains('onlyoffice')) return sourcePath;
     if (portal == 'personal') {

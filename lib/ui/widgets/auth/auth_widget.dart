@@ -71,6 +71,7 @@ class AuthWidget extends StatelessWidget {
   }
 }
 
+// StateFullWidget для пароля чтобы управлять состоянием видимости
 class _PasswordTextField extends StatefulWidget {
   const _PasswordTextField({
     Key? key,
@@ -158,16 +159,5 @@ class _ErrorMessageWidget extends StatelessWidget {
         style: const TextStyle(color: Colors.red, fontSize: 17),
       ),
     );
-  }
-}
-
-mixin InputValidationMixin {
-  bool isPasswordValid(String password) => password.length == 6;
-
-  bool isEmailValid(String email) {
-    String pattern =
-        '^(([^<>()[]\\.,;:s@"]+(.[^<>()[]\\.,;:s@"]+)*)|(".+"))@(([[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}])|(([a-zA-Z-0-9]+.)+[a-zA-Z]{2,}))\$';
-    RegExp regex = RegExp(pattern);
-    return regex.hasMatch(email);
   }
 }

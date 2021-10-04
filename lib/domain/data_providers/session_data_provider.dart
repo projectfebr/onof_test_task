@@ -5,6 +5,7 @@ abstract class _Keys {
   static const portal = 'portal';
 }
 
+// провайдер содержит методы (get, set) работы с защищенным хранилищем телефона. Хранит token и portal
 class SessionDataProvider {
   static const _storage = FlutterSecureStorage();
 
@@ -17,6 +18,7 @@ class SessionDataProvider {
     }
   }
 
+// портал нам нужен для формирования url запроса
   Future<String?> getPortal() => _storage.read(key: _Keys.portal);
   Future<void> setPortal(String? value) async {
     if (value != null) {

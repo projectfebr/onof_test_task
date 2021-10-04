@@ -4,6 +4,8 @@ import 'package:onof_test_task/ui/navigation/main_navigation.dart';
 import 'package:onof_test_task/ui/widgets/main_screen/main_screen_model.dart';
 import 'package:provider/provider.dart';
 
+// Получает и передает данные из модели MainScreenModel
+//
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({
     Key? key,
@@ -12,7 +14,8 @@ class DrawerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = context.read<MainScreenModel>();
-    model.setUserData();
+    // Запрос на получение в модели данных профиля
+    // model.setUserData();
     return Drawer(
       child: Column(
         children: [
@@ -40,6 +43,7 @@ class DrawerWidget extends StatelessWidget {
             child: TextButton(
               onPressed: () {
                 SessionDataProvider().setToken(null);
+                SessionDataProvider().setPortal(null);
                 Navigator.pushReplacementNamed(
                     context, MainNavigationRouteNames.auth);
               },

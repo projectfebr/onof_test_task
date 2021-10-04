@@ -1,5 +1,6 @@
 import 'package:onof_test_task/domain/data_providers/session_data_provider.dart';
 
+// Модель приложения. Проверяет статус авторизации при запуске.
 class MyAppModel {
   final _tokenApiProvider = SessionDataProvider();
 

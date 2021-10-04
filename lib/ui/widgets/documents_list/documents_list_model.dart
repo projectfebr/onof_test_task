@@ -7,7 +7,11 @@ import 'package:onof_test_task/domain/entity/documents_list_response.dart';
 import 'package:onof_test_task/ui/navigation/main_navigation.dart';
 
 class DocumentsListModel extends ChangeNotifier {
+  // context нужен для обработки ошибки авторизации -
+  //переход на экран логина (на случай если токен станет не валидный)
   BuildContext context;
+
+  // при инициализации загружаем документы
   DocumentsListModel(
     String api,
     this.context,
@@ -25,20 +29,39 @@ class DocumentsListModel extends ChangeNotifier {
 
   final DateFormat _dateFormat = DateFormat.yMMMMd();
 
+// parentId - для перехода назад
   int? parentId;
+  // currentId - для обновления текущей папки (жест pull down)
   int? currentId;
+
+  String? token;
+  String? portal;
 
   String stringFromDate(DateTime? date) =>
       date != null ? _dateFormat.format(date) : '';
 
   Future<void> loadDocuments(String api) async {
-    final token = await SessionDataProvider().getToken();
-    final portal = await SessionDataProvider().getPortal();
-    if (token == null || portal == null) return;
+    // api - эндпоинт запроса
+    // проверяем токен и портал, если null - то получаем
+    token ??= await SessionDataProvider().getToken();
+    portal ??= await SessionDataProvider().getPortal();
+
+// если токен и портал null - переходим на экран авторизации;
+    if (token == null) {
+      await SessionDataProvider().setPortal(null);
+      Navigator.pushReplacementNamed((context), MainNavigationRouteNames.auth);
+    }
+    if (portal == null) {
+      await SessionDataProvider().setToken(null);
+      Navigator.pushReplacementNamed((context), MainNavigationRouteNames.auth);
+    }
+
+// отправляем запрос, добалвяем папки и файлы,
+//устанавливаемы текущую и родительскую папки
     DocumentsList documentsListResponse;
     try {
       documentsListResponse = await _apiClient.getDocumentsList(
-          token: token, portal: portal, api: api);
+          token: token!, portal: portal!, api: api);
       _folders.addAll(documentsListResponse.response.folders);
       _files.addAll(documentsListResponse.response.files);
       parentId = documentsListResponse.response.current.parentId;

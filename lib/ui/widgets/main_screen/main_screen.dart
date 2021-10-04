@@ -6,6 +6,7 @@ import 'package:onof_test_task/ui/widgets/documents_list/documents_list_widget.d
 import 'package:onof_test_task/ui/widgets/main_screen/main_screen_model.dart';
 import 'package:provider/provider.dart';
 
+// Виджет обернут провайдером с моделью MainScreenWidget/
 class MainScreenWidget extends StatelessWidget {
   const MainScreenWidget({Key? key}) : super(key: key);
 
@@ -28,6 +29,7 @@ class _TitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Получаем выбранную вкладку из модели
     final selectedTab =
         context.select<MainScreenModel, Section>((model) => model.selectedTab);
     switch (selectedTab) {
@@ -44,6 +46,7 @@ class _BodyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Получаем выбранную вкладку из модели
     final selectedTab =
         context.select<MainScreenModel, Section>((model) => model.selectedTab);
     String api;
