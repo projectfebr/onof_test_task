@@ -55,7 +55,7 @@ class _BodyWidget extends StatelessWidget {
         api = ApiEndpoint.commonDocuments;
         break;
     }
-    final documentsListModel = DocumentsListModel(api);
+    final documentsListModel = DocumentsListModel(api, context);
     return ChangeNotifierProvider<DocumentsListModel>.value(
       value: documentsListModel,
       child: const DocumentsListWidget(),
