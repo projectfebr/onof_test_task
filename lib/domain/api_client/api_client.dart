@@ -112,6 +112,7 @@ class ApiClient {
         },
       );
       final json = jsonDecode(response.body);
+      _validateResponse(response, json);
       final documentsListResponse = DocumentsList.fromJson(json);
       return documentsListResponse;
     } on SocketException {
@@ -127,7 +128,8 @@ class ApiClient {
     if (response.statusCode == 500) {
       final int status = json["statusCode"] as int;
       final code = status is int ? status : 0;
-      if (code == 500) {
+      if (code == 500 &&
+          json["error"]["message"] as String == 'User authentication failed') {
         throw ApiClientException(ApiClientExceptionType.auth);
       } else {
         throw ApiClientException(ApiClientExceptionType.other);

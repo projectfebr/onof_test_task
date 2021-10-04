@@ -5,14 +5,6 @@ import 'package:onof_test_task/domain/api_client/api_client.dart';
 import 'package:onof_test_task/domain/data_providers/session_data_provider.dart';
 import 'package:onof_test_task/ui/navigation/main_navigation.dart';
 
-enum ApiClientAuthExceptionType { network, auth, portal, other }
-
-class ApiClientAuthException implements Exception {
-  final ApiClientAuthExceptionType type;
-
-  ApiClientAuthException(this.type);
-}
-
 class AuthModel extends ChangeNotifier {
   final _apiCLient = ApiClient();
   final _sessionDataProvider = SessionDataProvider();
@@ -47,18 +39,18 @@ class AuthModel extends ChangeNotifier {
     try {
       token = await _apiCLient.auth(
           username: username, password: password, portal: portal);
-    } on ApiClientAuthException catch (e) {
+    } on ApiClientException catch (e) {
       switch (e.type) {
-        case ApiClientAuthExceptionType.network:
+        case ApiClientExceptionType.network:
           _errorMessage = 'Server not available. Check internet connection.';
           break;
-        case ApiClientAuthExceptionType.auth:
+        case ApiClientExceptionType.auth:
           _errorMessage = 'Incorrect login or password.';
           break;
-        case ApiClientAuthExceptionType.portal:
+        case ApiClientExceptionType.portal:
           _errorMessage = 'Check the name of the portal.';
           break;
-        case ApiClientAuthExceptionType.other:
+        case ApiClientExceptionType.other:
           _errorMessage = 'An error has occurred. Try again.';
           break;
       }
